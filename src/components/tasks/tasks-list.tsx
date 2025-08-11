@@ -54,8 +54,6 @@ interface TasksListProps {
 }
 
 export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
-  const [filteredTasks, setFilteredTasks] = useState(tasks);
-
   const getPriorityColor = (priority: string | null) => {
     switch (priority?.toLowerCase()) {
       case 'high': return 'destructive';
@@ -111,12 +109,12 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          {filteredTasks.length} of {tasks.length} tasks
+          {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
         </p>
       </div>
 
       <div className="space-y-3">
-        {filteredTasks.map((task) => (
+        {tasks.map((task) => (
           <Card key={task.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">

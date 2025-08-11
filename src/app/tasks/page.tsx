@@ -4,8 +4,7 @@ import { db } from '@/server/db';
 import { tasks, projects, users } from '@/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import { TasksList } from '@/components/tasks/tasks-list';
-import { TasksFilters } from '@/components/tasks/tasks-filters';
+import { TasksWithFilters } from '@/components/tasks/tasks-with-filters';
 
 async function TasksContent() {
   const session = await auth();
@@ -88,12 +87,7 @@ async function TasksContent() {
         </p>
       </div>
 
-      <TasksFilters 
-        projects={allProjects}
-        teamMembers={teamMembers}
-      />
-
-      <TasksList 
+      <TasksWithFilters
         tasks={allTasks}
         projects={allProjects}
         teamMembers={teamMembers}

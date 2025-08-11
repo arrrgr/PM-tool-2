@@ -9,7 +9,7 @@ import { ProjectHeader } from '@/components/projects/project-header';
 import { KanbanBoard } from '@/components/kanban/kanban-board';
 
 interface ProjectPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function ProjectContent({ projectId }: { projectId: string }) {
@@ -98,11 +98,12 @@ async function ProjectContent({ projectId }: { projectId: string }) {
   );
 }
 
-export default function ProjectPage({ params }: ProjectPageProps) {
+export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { id } = await params;
   return (
     <DashboardLayout>
       <Suspense fallback={<div>Loading project...</div>}>
-        <ProjectContent projectId={params.id} />
+        <ProjectContent projectId={id} />
       </Suspense>
     </DashboardLayout>
   );

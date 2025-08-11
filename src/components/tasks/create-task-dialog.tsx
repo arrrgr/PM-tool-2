@@ -40,8 +40,8 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
     description: '',
     priority: 'medium',
     type: 'task',
-    assigneeId: '',
-    storyPoints: '',
+    assigneeId: 'unassigned',
+    storyPoints: 'none',
     dueDate: '',
   });
 
@@ -69,13 +69,20 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
     setIsLoading(true);
 
     try {
-      const taskData = {
-        ...formData,
+      const taskData: any = {
+        title: formData.title,
+        description: formData.description || undefined,
         projectId,
-        storyPoints: formData.storyPoints ? parseInt(formData.storyPoints) : null,
-        dueDate: formData.dueDate || null,
-        assigneeId: formData.assigneeId || null,
+        priority: formData.priority,
+        type: formData.type,
+        storyPoints: formData.storyPoints && formData.storyPoints !== 'none' ? parseInt(formData.storyPoints) : undefined,
+        dueDate: formData.dueDate || undefined,
       };
+      
+      // Only add assigneeId if it's not 'unassigned'
+      if (formData.assigneeId && formData.assigneeId !== 'unassigned') {
+        taskData.assigneeId = formData.assigneeId;
+      }
 
       const response = await fetch('/api/tasks', {
         method: 'POST',
@@ -92,11 +99,12 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
           description: '',
           priority: 'medium',
           type: 'task',
-          assigneeId: '',
-          storyPoints: '',
+          assigneeId: 'unassigned',
+          storyPoints: 'none',
           dueDate: '',
         });
-        router.refresh();
+        // Force a full page reload to ensure the new task appears
+        window.location.reload();
       } else {
         const error = await response.text();
         alert('Error creating task: ' + error);
@@ -188,7 +196,7 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
                     <SelectValue placeholder="Assign to..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     {teamMembers.map((member) => (
                       <SelectItem key={member.id} value={member.id}>
                         {member.name || member.email}
@@ -205,7 +213,7 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
                     <SelectValue placeholder="Select points" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="1">1</SelectItem>
                     <SelectItem value="2">2</SelectItem>
                     <SelectItem value="3">3</SelectItem>

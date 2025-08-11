@@ -29,11 +29,11 @@ interface TasksFiltersProps {
 export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFiltersProps) {
   const [filters, setFilters] = useState({
     search: '',
-    project: '',
-    assignee: '',
-    status: '',
-    priority: '',
-    type: '',
+    project: 'all',
+    assignee: 'all',
+    status: 'all',
+    priority: 'all',
+    type: 'all',
   });
 
   const handleFilterChange = (key: string, value: string) => {
@@ -45,17 +45,17 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
   const clearFilters = () => {
     const emptyFilters = {
       search: '',
-      project: '',
-      assignee: '',
-      status: '',
-      priority: '',
-      type: '',
+      project: 'all',
+      assignee: 'all',
+      status: 'all',
+      priority: 'all',
+      type: 'all',
     };
     setFilters(emptyFilters);
     onFiltersChange?.(emptyFilters);
   };
 
-  const activeFiltersCount = Object.values(filters).filter(Boolean).length;
+  const activeFiltersCount = Object.entries(filters).filter(([key, value]) => value && value !== 'all').length;
 
   return (
     <div className="space-y-4">
@@ -77,7 +77,7 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
             <SelectValue placeholder="All Projects" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Projects</SelectItem>
+            <SelectItem value="all">All Projects</SelectItem>
             {projects.map((project) => (
               <SelectItem key={project.id} value={project.id}>
                 {project.name}
@@ -92,7 +92,7 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
             <SelectValue placeholder="All Assignees" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Assignees</SelectItem>
+            <SelectItem value="all">All Assignees</SelectItem>
             <SelectItem value="unassigned">Unassigned</SelectItem>
             {teamMembers.map((member) => (
               <SelectItem key={member.id} value={member.id}>
@@ -108,7 +108,7 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="To Do">To Do</SelectItem>
             <SelectItem value="In Progress">In Progress</SelectItem>
             <SelectItem value="In Review">In Review</SelectItem>
@@ -122,7 +122,7 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
             <SelectValue placeholder="All Priorities" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Priorities</SelectItem>
+            <SelectItem value="all">All Priorities</SelectItem>
             <SelectItem value="low">Low</SelectItem>
             <SelectItem value="medium">Medium</SelectItem>
             <SelectItem value="high">High</SelectItem>
@@ -135,7 +135,7 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="task">📝 Task</SelectItem>
             <SelectItem value="feature">✨ Feature</SelectItem>
             <SelectItem value="bug">🐛 Bug</SelectItem>
@@ -165,50 +165,50 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
               />
             </Badge>
           )}
-          {filters.project && (
+          {filters.project && filters.project !== 'all' && (
             <Badge variant="secondary">
               Project: {projects.find(p => p.id === filters.project)?.name}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterChange('project', '')}
+                onClick={() => handleFilterChange('project', 'all')}
               />
             </Badge>
           )}
-          {filters.assignee && (
+          {filters.assignee && filters.assignee !== 'all' && (
             <Badge variant="secondary">
               Assignee: {filters.assignee === 'unassigned' 
                 ? 'Unassigned' 
                 : teamMembers.find(m => m.id === filters.assignee)?.name || 'Unknown'}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterChange('assignee', '')}
+                onClick={() => handleFilterChange('assignee', 'all')}
               />
             </Badge>
           )}
-          {filters.status && (
+          {filters.status && filters.status !== 'all' && (
             <Badge variant="secondary">
               Status: {filters.status}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterChange('status', '')}
+                onClick={() => handleFilterChange('status', 'all')}
               />
             </Badge>
           )}
-          {filters.priority && (
+          {filters.priority && filters.priority !== 'all' && (
             <Badge variant="secondary">
               Priority: {filters.priority}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterChange('priority', '')}
+                onClick={() => handleFilterChange('priority', 'all')}
               />
             </Badge>
           )}
-          {filters.type && (
+          {filters.type && filters.type !== 'all' && (
             <Badge variant="secondary">
               Type: {filters.type}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
-                onClick={() => handleFilterChange('type', '')}
+                onClick={() => handleFilterChange('type', 'all')}
               />
             </Badge>
           )}

@@ -17,7 +17,7 @@ const updateTaskSchema = z.object({
 });
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const taskId = params.id;
+    const { id: taskId } = await params;
     const body = await request.json();
     const updates = updateTaskSchema.parse(body);
 
