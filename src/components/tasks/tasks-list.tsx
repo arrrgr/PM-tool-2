@@ -7,7 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Calendar, ExternalLink } from 'lucide-react';
+import { Calendar, ExternalLink, Edit2 } from 'lucide-react';
+import { EditTaskDialog } from './edit-task-dialog';
 
 interface Task {
   id: string;
@@ -54,6 +55,9 @@ interface TasksListProps {
 }
 
 export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+
   const getPriorityColor = (priority: string | null) => {
     switch (priority?.toLowerCase()) {
       case 'high': return 'destructive';
@@ -188,6 +192,16 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
                 </div>
 
                 <div className="flex items-center space-x-2 ml-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setSelectedTask(task);
+                      setEditDialogOpen(true);
+                    }}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                   <Link href={`/projects/${task.project?.id}`} passHref>
                     <Button variant="ghost" size="sm">
                       <ExternalLink className="h-4 w-4" />
@@ -199,6 +213,27 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
           </Card>
         ))}
       </div>
+      
+      {selectedTask && (
+        <EditTaskDialog
+          task={{
+            id: selectedTask.id,
+            key: selectedTask.key,
+            title: selectedTask.title,
+            description: selectedTask.description,
+            status: selectedTask.status,
+            priority: selectedTask.priority,
+            type: selectedTask.type,
+            storyPoints: selectedTask.storyPoints,
+            dueDate: selectedTask.dueDate,
+            assigneeId: selectedTask.assignee?.id || null,
+            projectId: selectedTask.project?.id || '',
+          }}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          teamMembers={teamMembers}
+        />
+      )}
     </div>
   );
 }

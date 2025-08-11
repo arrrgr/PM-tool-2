@@ -15,6 +15,7 @@ import {
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { KanbanColumn } from './kanban-column';
 import { TaskCard } from './task-card';
+import { EditTaskDialog } from '@/components/tasks/edit-task-dialog';
 
 interface Task {
   id: string;
@@ -54,7 +55,14 @@ interface KanbanBoardProps {
 export function KanbanBoard({ tasks, statuses, projectId, teamMembers }: KanbanBoardProps) {
   const [items, setItems] = useState(tasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const router = useRouter();
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setEditDialogOpen(true);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -148,6 +156,7 @@ export function KanbanBoard({ tasks, statuses, projectId, teamMembers }: KanbanB
               tasks={getTasksByStatus(status)}
               projectId={projectId}
               teamMembers={teamMembers}
+              onTaskClick={handleTaskClick}
             />
           ))}
         </div>
@@ -156,6 +165,27 @@ export function KanbanBoard({ tasks, statuses, projectId, teamMembers }: KanbanB
           {activeTask ? <TaskCard task={activeTask} isDragging /> : null}
         </DragOverlay>
       </DndContext>
+      
+      {selectedTask && (
+        <EditTaskDialog
+          task={{
+            id: selectedTask.id,
+            key: selectedTask.key,
+            title: selectedTask.title,
+            description: selectedTask.description,
+            status: selectedTask.status,
+            priority: selectedTask.priority,
+            type: selectedTask.type,
+            storyPoints: selectedTask.storyPoints,
+            dueDate: selectedTask.dueDate,
+            assigneeId: selectedTask.assignee?.id || null,
+            projectId: projectId,
+          }}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          teamMembers={teamMembers}
+        />
+      )}
     </div>
   );
 }

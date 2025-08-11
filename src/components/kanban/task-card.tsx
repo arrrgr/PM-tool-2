@@ -32,9 +32,10 @@ interface Task {
 interface TaskCardProps {
   task: Task;
   isDragging?: boolean;
+  onClick?: () => void;
 }
 
-export function TaskCard({ task, isDragging = false }: TaskCardProps) {
+export function TaskCard({ task, isDragging = false, onClick }: TaskCardProps) {
   const {
     attributes,
     listeners,
@@ -96,6 +97,7 @@ export function TaskCard({ task, isDragging = false }: TaskCardProps) {
         getPriorityColor(task.priority),
         (isDragging || isSortableDragging) && 'opacity-50 rotate-5 shadow-lg',
       )}
+      onDoubleClick={onClick}
       {...attributes}
       {...listeners}
     >
