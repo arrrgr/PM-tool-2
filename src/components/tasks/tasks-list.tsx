@@ -7,8 +7,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Calendar, ExternalLink, Edit2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar, ExternalLink, Edit2, MessageSquare } from 'lucide-react';
 import { EditTaskDialog } from './edit-task-dialog';
+import { BulkOperationsToolbar } from './bulk-operations-toolbar';
+import { useRouter } from 'next/navigation';
 
 interface Task {
   id: string;
@@ -33,6 +36,7 @@ interface Task {
     email: string;
     image: string | null;
   } | null;
+  commentCount?: number;
 }
 
 interface Project {
@@ -57,6 +61,9 @@ interface TasksListProps {
 export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const router = useRouter();
 
   const getPriorityColor = (priority: string | null) => {
     switch (priority?.toLowerCase()) {
@@ -96,6 +103,34 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
       .slice(0, 2);
   };
 
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTasks((prev) =>
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedTasks([]);
+      setSelectAll(false);
+    } else {
+      setSelectedTasks(tasks.map((t) => t.id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedTasks([]);
+    setSelectAll(false);
+  };
+
+  const handleOperationComplete = () => {
+    router.refresh();
+    handleClearSelection();
+  };
+
   if (tasks.length === 0) {
     return (
       <div className="text-center py-12">
@@ -114,15 +149,36 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
           {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+          {selectedTasks.length > 0 && ` • ${selectedTasks.length} selected`}
         </p>
+        {tasks.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSelectAll}
+          >
+            {selectAll ? 'Deselect All' : 'Select All'}
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">
         {tasks.map((task) => (
-          <Card key={task.id} className="hover:shadow-md transition-shadow">
+          <Card 
+            key={task.id} 
+            className={`hover:shadow-md transition-all ${
+              selectedTasks.includes(task.id) ? 'ring-2 ring-blue-500 bg-blue-50/50' : ''
+            }`}
+          >
             <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  checked={selectedTasks.includes(task.id)}
+                  onCheckedChange={() => handleSelectTask(task.id)}
+                  className="mt-1"
+                />
+                <div className="flex items-start justify-between flex-1">
+                  <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-3 mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="text-xs font-mono text-muted-foreground">
@@ -173,6 +229,13 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
                       {task.updatedAt && (
                         <span>Updated {format(task.updatedAt, 'MMM d')}</span>
                       )}
+                      
+                      {task.commentCount !== undefined && task.commentCount > 0 && (
+                        <div className="flex items-center space-x-1">
+                          <MessageSquare className="h-3 w-3" />
+                          <span>{task.commentCount} comments</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -209,6 +272,7 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
                   </Link>
                 </div>
               </div>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -234,6 +298,14 @@ export function TasksList({ tasks, projects, teamMembers }: TasksListProps) {
           teamMembers={teamMembers}
         />
       )}
+      
+      <BulkOperationsToolbar
+        selectedTasks={selectedTasks}
+        onClearSelection={handleClearSelection}
+        onOperationComplete={handleOperationComplete}
+        teamMembers={teamMembers}
+        projects={projects}
+      />
     </div>
   );
 }

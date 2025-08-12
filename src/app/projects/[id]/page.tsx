@@ -2,11 +2,11 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
-import { projects, tasks, users } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { projects, tasks, users, comments } from '@/server/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { ProjectHeader } from '@/components/projects/project-header';
-import { KanbanBoard } from '@/components/kanban/kanban-board';
+import { KanbanWithFilters } from '@/components/kanban/kanban-with-filters';
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
@@ -40,7 +40,7 @@ async function ProjectContent({ projectId }: { projectId: string }) {
     notFound();
   }
 
-  // Get tasks for this project with assignee information
+  // Get tasks for this project with assignee information and comment counts
   const projectTasks = await db
     .select({
       id: tasks.id,
@@ -60,6 +60,7 @@ async function ProjectContent({ projectId }: { projectId: string }) {
         email: users.email,
         image: users.image,
       },
+      commentCount: sql<number>`(SELECT COUNT(*) FROM pmtool_comment WHERE task_id = ${tasks.id})::int`,
     })
     .from(tasks)
     .leftJoin(users, eq(tasks.assigneeId, users.id))
@@ -69,7 +70,7 @@ async function ProjectContent({ projectId }: { projectId: string }) {
         eq(tasks.isArchived, false)
       )
     )
-    .orderBy(tasks.createdAt);
+    .orderBy(tasks.dueDate);
 
   // Get team members for the organization
   const teamMembers = await db.query.users.findMany({
@@ -88,11 +89,12 @@ async function ProjectContent({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-6">
       <ProjectHeader project={project} />
-      <KanbanBoard 
+      <KanbanWithFilters 
         tasks={projectTasks} 
         statuses={statuses}
         projectId={projectId}
         teamMembers={teamMembers}
+        project={project}
       />
     </div>
   );

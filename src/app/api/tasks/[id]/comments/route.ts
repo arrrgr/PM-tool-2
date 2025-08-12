@@ -9,6 +9,7 @@ import { randomUUID } from 'crypto';
 const createCommentSchema = z.object({
   content: z.string().min(1).max(5000),
   isInternal: z.boolean().optional(),
+  mentions: z.array(z.string()).optional(),
 });
 
 interface RouteParams {

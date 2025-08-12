@@ -61,7 +61,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.status !== undefined) updateData.status = updates.status;
     if (updates.priority !== undefined) updateData.priority = updates.priority;
-    if (updates.type !== undefined) updateData.type = updates.type;
+    if (updates.type !== undefined) {
+      updateData.type = updates.type;
+      // Mark as epic if type is set to epic
+      if (updates.type === 'epic') {
+        updateData.isEpic = true;
+      }
+    }
     if (updates.assigneeId !== undefined) updateData.assigneeId = updates.assigneeId || null;
     if (updates.storyPoints !== undefined) updateData.storyPoints = updates.storyPoints;
     if (updates.dueDate !== undefined) {
@@ -99,7 +105,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const taskId = params.id;
+    const { id: taskId } = await params;
 
     const task = await db.query.tasks.findFirst({
       where: eq(tasks.id, taskId),
@@ -169,7 +175,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const taskId = params.id;
+    const { id: taskId } = await params;
 
     // Get the task and verify it belongs to the user's organization
     const task = await db

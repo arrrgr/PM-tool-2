@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
-import { tasks, projects, users } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { tasks, projects, users, comments } from '@/server/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { TasksWithFilters } from '@/components/tasks/tasks-with-filters';
 
@@ -40,6 +40,7 @@ async function TasksContent() {
         email: users.email,
         image: users.image,
       },
+      commentCount: sql<number>`(SELECT COUNT(*) FROM pmtool_comment WHERE task_id = ${tasks.id})::int`,
     })
     .from(tasks)
     .innerJoin(projects, eq(tasks.projectId, projects.id))

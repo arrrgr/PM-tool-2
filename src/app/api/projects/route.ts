@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     const organizationProjects = await db.query.projects.findMany({
       where: (projects, { eq, and }) => and(
-        eq(projects.organizationId, session.user.organizationId),
+        eq(projects.organizationId, session.user.organizationId!),
         eq(projects.isArchived, false)
       ),
       with: {

@@ -24,9 +24,10 @@ interface TasksFiltersProps {
   projects: Project[];
   teamMembers: TeamMember[];
   onFiltersChange?: (filters: any) => void;
+  hideProjectFilter?: boolean;
 }
 
-export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFiltersProps) {
+export function TasksFilters({ projects, teamMembers, onFiltersChange, hideProjectFilter = false }: TasksFiltersProps) {
   const [filters, setFilters] = useState({
     search: '',
     project: 'all',
@@ -72,19 +73,21 @@ export function TasksFilters({ projects, teamMembers, onFiltersChange }: TasksFi
         </div>
 
         {/* Project Filter */}
-        <Select value={filters.project} onValueChange={(value) => handleFilterChange('project', value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Projects" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Projects</SelectItem>
-            {projects.map((project) => (
-              <SelectItem key={project.id} value={project.id}>
-                {project.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!hideProjectFilter && (
+          <Select value={filters.project} onValueChange={(value) => handleFilterChange('project', value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All Projects" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
+              {projects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         {/* Assignee Filter */}
         <Select value={filters.assignee} onValueChange={(value) => handleFilterChange('assignee', value)}>

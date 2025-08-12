@@ -27,6 +27,7 @@ interface Task {
     email: string;
     image: string | null;
   } | null;
+  commentCount?: number;
 }
 
 interface TaskCardProps {
@@ -88,6 +89,14 @@ export function TaskCard({ task, isDragging = false, onClick }: TaskCardProps) {
       .slice(0, 2);
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent click when dragging
+    if (!isDragging && !isSortableDragging && onClick) {
+      e.stopPropagation();
+      onClick();
+    }
+  };
+
   return (
     <Card
       ref={setNodeRef}
@@ -97,11 +106,16 @@ export function TaskCard({ task, isDragging = false, onClick }: TaskCardProps) {
         getPriorityColor(task.priority),
         (isDragging || isSortableDragging) && 'opacity-50 rotate-5 shadow-lg',
       )}
-      onDoubleClick={onClick}
+      onDoubleClick={handleClick}
       {...attributes}
       {...listeners}
     >
-      <CardContent className="p-3 space-y-3">
+      <CardContent className="p-3 space-y-3 relative group">
+        {/* Edit hint */}
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground">
+          Double-click to edit
+        </div>
+        
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
@@ -145,11 +159,13 @@ export function TaskCard({ task, isDragging = false, onClick }: TaskCardProps) {
         {/* Footer */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            {/* Placeholder for comments count */}
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <MessageSquare className="h-3 w-3" />
-              <span>0</span>
-            </div>
+            {/* Comments count */}
+            {(task.commentCount !== undefined && task.commentCount > 0) && (
+              <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                <MessageSquare className="h-3 w-3" />
+                <span>{task.commentCount}</span>
+              </div>
+            )}
             {/* Placeholder for attachments count */}
             <div className="flex items-center space-x-1 text-xs text-muted-foreground">
               <Paperclip className="h-3 w-3" />

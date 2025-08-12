@@ -406,30 +406,118 @@ sequenceDiagram
   - Edit tasks via modal dialog
   - Delete/Archive tasks with confirmation
   - Update status, priority, assignee, due dates
-- ✅ **FR-C2**: Drag-and-drop Kanban board (partial)
-- ✅ **FR-C6**: Comments on tasks (without @mentions)
-- ✅ **FR-D1**: Personal dashboard (basic)
+- ✅ **FR-C2**: Full Kanban board functionality
+  - Drag-and-drop between columns
+  - Double-click to edit tasks
+  - Visual hints on hover
+  - Create Task button integrated
+  - Full filtering capabilities
+  - Default sort by due date
+- ✅ **FR-C6**: Comments on tasks with @mentions functionality
+  - Real-time autocomplete for team member mentions
+  - Visual highlighting of mentions
+  - Comment counts displayed on task cards
+- ✅ **FR-D1**: Personalized dashboard
+  - Shows only user's assigned tasks
+  - Overdue tasks section with warnings
+  - Due Soon section (next 3 days)
+  - Personal task statistics
+  - Quick action links to main areas
 - ✅ **FR-G1**: Task search functionality
 - ✅ **FR-G2**: Task filtering (project, assignee, status, priority, type)
 
 #### **Technical Implementations:**
 - Edit Task Dialog with tabbed interface (Details/Comments)
-- Task Comments API endpoints and UI components
+- Task Comments with @mentions autocomplete
+- TaskCommentsWithMentions component for enhanced collaboration
+- KanbanWithFilters component for filtered board view
 - Alert dialogs for destructive actions
-- Optimistic UI updates
-- Real-time task filtering
-- Double-click to edit on Kanban cards
+- Optimistic UI updates with window.location.reload() for task creation
+- Real-time task filtering across all views
+- Double-click to edit on Kanban cards with visual hints
+- Comment counts via SQL subqueries for performance
+- Personalized dashboard with user-specific metrics
 
-### **Phase 2 - Planned Features (In Progress)**
-- **Epic B**: Project hierarchy (Epics/Tasks/Subtasks)
-- **Epic E**: Slack integration
-- **Epic F**: GitHub integration
-- **Epic A**: Team invitations and role management
+### **Phase 2 - Next Sprint (Priority Order)**
+1. **Epic B**: Project hierarchy (Epics/Tasks/Subtasks)
+   - Create Epic as parent container for multiple tasks
+   - Support sub-tasks under main tasks
+   - Visual hierarchy in Kanban and List views
+   - Breadcrumb navigation
 
-### **Phase 3 - Advanced Features (Planned)**
-- **Epic K**: AI Knowledge Base with auto-documentation
-- **FR-C4**: Time tracking
-- **FR-C5**: File attachments
-- **FR-H1**: TOTP MFA
-- Advanced reporting and analytics
+2. **Epic A-03 to A-05**: Team Management
+   - Email invitations for team members
+   - Role-based access control (Owner/Admin/Member)
+   - Team member management UI
+
+3. **FR-C4**: Time Tracking
+   - Start/stop timer on tasks
+   - Manual time entry
+   - Time logs and reports
+
+4. **FR-C5**: File Attachments
+   - Upload files to tasks and comments
+   - S3 integration for storage
+   - Preview for images/documents
+
+### **User Backlog (Features Requested During Development)**
+
+These features were identified during Phase 1 development based on user feedback:
+
+#### **High Priority**
+- ✅ **Make tasks editable from Kanban view** - COMPLETED (double-click to edit)
+- ✅ **Add Task Filters to Kanban Board** - COMPLETED (same filters as Tasks page)
+- ✅ **Default sort tasks by due date** - COMPLETED (automatic sorting)
+- ✅ **Show comment counts on task cards** - COMPLETED (displays actual count)
+- ✅ **Implement @mentions in comments** - COMPLETED (with autocomplete)
+- ✅ **Personalized dashboard** - COMPLETED (user-specific view)
+
+#### **Medium Priority (Phase 2)**
+- Bulk task operations (select multiple tasks)
+- Task templates for common workflows
+- Custom fields for tasks
+- Recurring tasks
+- Task dependencies visualization
+- Quick add task from any page (global shortcut)
+- Export tasks to CSV/Excel
+- Print-friendly task views
+
+#### **Low Priority (Future)**
+- Dark mode theme
+- Keyboard shortcuts for power users
+- Mobile app (iOS/Android)
+- Email notifications digest
+- Calendar view integration
+- Timezone handling for global teams
+- Custom task statuses per project
+- Archived tasks recovery
+
+### **Phase 3 - Q1 2026 (Planned)**
+1. **Epic E**: Slack Integration
+   - OAuth connection flow
+   - Notifications for task updates
+   - Create tasks from Slack
+   - Status updates in channels
+
+2. **Epic F**: GitHub Integration
+   - Link issues to tasks
+   - Auto-status updates from PRs
+   - Branch creation from tasks
+   - Commit linking
+
+3. **Epic K**: AI Knowledge Base
+   - Auto-documentation from code changes
+   - AI-powered search
+   - Documentation suggestions
+   - Knowledge graph visualization
+
+4. **Advanced Features**
+   - FR-H1: TOTP MFA for security
+   - Gantt chart view
+   - Sprint planning tools
+   - Resource allocation
+   - Budget tracking
+   - Custom workflows
+   - Advanced analytics and reporting
+   - API for third-party integrations
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Attachment</title>
+</head>
+<body>
+    <h1>Test Image for Upload</h1>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <br>
+    <a id="download" download="test-image.png">Download Test Image</a>
+    
+    <script>
+        // Create a simple test image
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Draw a gradient
+        const gradient = ctx.createLinearGradient(0, 0, 200, 200);
+        gradient.addColorStop(0, '#4f46e5');
+        gradient.addColorStop(1, '#7c3aed');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 200, 200);
+        
+        // Add text
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Test Image', 100, 100);
+        ctx.fillText('for Attachments', 100, 130);
+        
+        // Convert to blob and create download link
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            document.getElementById('download').href = url;
+        });
+    </script>
+</body>
+</html>

@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import { TasksFilters } from './tasks-filters';
 import { TasksList } from './tasks-list';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 interface Task {
   id: string;
@@ -111,13 +113,31 @@ export function TasksWithFilters({ tasks, projects, teamMembers }: TasksWithFilt
     setFilters(newFilters);
   };
 
+  const handleExport = () => {
+    const params = new URLSearchParams();
+    if (filters.project !== 'all') params.append('projectId', filters.project);
+    if (filters.assignee !== 'all' && filters.assignee !== 'unassigned') params.append('assigneeId', filters.assignee);
+    if (filters.status !== 'all') params.append('status', filters.status);
+    if (filters.priority !== 'all') params.append('priority', filters.priority);
+    
+    const url = `/api/tasks/export?${params.toString()}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <>
-      <TasksFilters 
-        projects={projects}
-        teamMembers={teamMembers}
-        onFiltersChange={handleFiltersChange}
-      />
+      <div className="flex justify-between items-start gap-4 mb-6">
+        <TasksFilters 
+          projects={projects}
+          teamMembers={teamMembers}
+          onFiltersChange={handleFiltersChange}
+        />
+        
+        <Button onClick={handleExport} variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
       
       <TasksList 
         tasks={filteredTasks}

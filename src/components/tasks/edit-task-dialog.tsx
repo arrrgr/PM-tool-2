@@ -27,7 +27,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Trash2, Archive } from 'lucide-react';
-import { TaskComments } from './task-comments';
+import { TaskCommentsWithMentions } from './task-comments-with-mentions';
+import { TimeTracker } from '../time-tracking/time-tracker';
+import { TimeEntryDialog } from '../time-tracking/time-entry-dialog';
+import { WorkLogList } from '../time-tracking/work-log-list';
+import { FileUpload } from '../attachments/file-upload';
+import { AttachmentList } from '../attachments/attachment-list';
+import { EpicView } from './epic-view';
 
 interface Task {
   id: string;
@@ -41,6 +47,8 @@ interface Task {
   dueDate: Date | null;
   assigneeId: string | null;
   projectId: string;
+  isEpic?: boolean;
+  progress?: number;
 }
 
 interface TeamMember {
@@ -60,6 +68,9 @@ interface EditTaskDialogProps {
 export function EditTaskDialog({ task, open, onOpenChange, teamMembers }: EditTaskDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [refreshLogs, setRefreshLogs] = useState(0);
+  const [refreshAttachments, setRefreshAttachments] = useState(0);
+  const [refreshSubtasks, setRefreshSubtasks] = useState(0);
   const [formData, setFormData] = useState({
     title: task.title,
     description: task.description || '',
@@ -180,9 +191,12 @@ export function EditTaskDialog({ task, open, onOpenChange, teamMembers }: EditTa
           </DialogHeader>
           
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="comments">Comments</TabsTrigger>
+              <TabsTrigger value="time">Time Tracking</TabsTrigger>
+              <TabsTrigger value="attachments">Attachments</TabsTrigger>
+              <TabsTrigger value="subtasks">Sub-tasks</TabsTrigger>
             </TabsList>
             
             <TabsContent value="details">
@@ -250,10 +264,12 @@ export function EditTaskDialog({ task, open, onOpenChange, teamMembers }: EditTa
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="task">📝 Task</SelectItem>
+                      <SelectItem value="epic">🎯 Epic</SelectItem>
                       <SelectItem value="feature">✨ Feature</SelectItem>
                       <SelectItem value="bug">🐛 Bug</SelectItem>
                       <SelectItem value="improvement">⚡ Improvement</SelectItem>
                       <SelectItem value="story">📖 Story</SelectItem>
+                      <SelectItem value="sub-task">📌 Sub-task</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -320,7 +336,41 @@ export function EditTaskDialog({ task, open, onOpenChange, teamMembers }: EditTa
           </TabsContent>
           
           <TabsContent value="comments" className="space-y-4">
-            <TaskComments taskId={task.id} />
+            <TaskCommentsWithMentions taskId={task.id} teamMembers={teamMembers} />
+          </TabsContent>
+          
+          <TabsContent value="time" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <TimeTracker taskId={task.id} onTimeLogged={() => setRefreshLogs(r => r + 1)} />
+              <TimeEntryDialog taskId={task.id} onTimeLogged={() => setRefreshLogs(r => r + 1)} />
+            </div>
+            <WorkLogList taskId={task.id} refresh={refreshLogs} />
+          </TabsContent>
+          
+          <TabsContent value="attachments" className="space-y-4">
+            <div className="space-y-4">
+              <FileUpload 
+                taskId={task.id} 
+                onUploadComplete={() => setRefreshAttachments(r => r + 1)} 
+              />
+              <AttachmentList 
+                taskId={task.id} 
+                refresh={refreshAttachments} 
+              />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="subtasks" className="space-y-4">
+            <EpicView 
+              taskId={task.id}
+              isEpic={task.isEpic || formData.type === 'epic'}
+              progress={task.progress}
+              teamMembers={teamMembers}
+              onSubtaskUpdate={() => {
+                setRefreshSubtasks(r => r + 1);
+                router.refresh();
+              }}
+            />
           </TabsContent>
         </Tabs>
         </DialogContent>

@@ -150,6 +150,8 @@ export const tasks = createTable('task', {
   status: varchar('status', { length: 50 }).default('To Do'),
   priority: varchar('priority', { length: 20 }).default('medium'),
   type: varchar('type', { length: 50 }).default('task'),
+  isEpic: boolean('is_epic').default(false),
+  progress: integer('progress').default(0), // 0-100 percentage for epics
   storyPoints: integer('story_points'),
   originalEstimate: integer('original_estimate'),
   remainingEstimate: integer('remaining_estimate'),
@@ -212,24 +214,105 @@ export const workLogs = createTable('work_log', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Knowledge Base
-export const knowledgeBase = createTable('knowledge_base', {
+// Knowledge Base Articles
+export const kbArticles = createTable('kb_article', {
   id: varchar('id', { length: 255 }).notNull().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 255 }).notNull().unique(),
   content: text('content').notNull(),
+  summary: text('summary'),
+  status: varchar('status', { length: 20 }).default('draft'),
+  type: varchar('type', { length: 50 }).default('guide'),
   organizationId: varchar('organization_id', { length: 255 })
     .notNull()
     .references(() => organizations.id),
-  projectId: varchar('project_id', { length: 255 })
-    .references(() => projects.id),
   authorId: varchar('author_id', { length: 255 })
     .notNull()
     .references(() => users.id),
-  tags: json('tags').$type<string[]>(),
-  isPublic: boolean('is_public').default(true),
-  embedding: text('embedding'),
+  categoryId: varchar('category_id', { length: 255 }).references(() => kbCategories.id),
+  tags: json('tags').$type<string[]>().default([]),
+  metadata: json('metadata').$type<{
+    readTime?: number;
+    views?: number;
+    likes?: number;
+    aiGenerated?: boolean;
+    lastAiUpdate?: Date;
+    relatedArticles?: string[];
+    keywords?: string[];
+  }>().default({}),
+  embedding: json('embedding').$type<number[]>(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  publishedAt: timestamp('published_at'),
+});
+
+// Knowledge Base Categories
+export const kbCategories = createTable('kb_category', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 255 }).notNull().unique(),
+  description: text('description'),
+  parentId: varchar('parent_id', { length: 255 }).references(() => kbCategories.id),
+  icon: varchar('icon', { length: 50 }),
+  order: integer('order').default(0),
+  organizationId: varchar('organization_id', { length: 255 })
+    .notNull()
+    .references(() => organizations.id),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Q&A System
+export const kbQuestions = createTable('kb_question', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  question: text('question').notNull(),
+  answer: text('answer'),
+  articleId: varchar('article_id', { length: 255 }).references(() => kbArticles.id),
+  askedById: varchar('asked_by_id', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  answeredById: varchar('answered_by_id', { length: 255 })
+    .references(() => users.id),
+  isAiAnswer: boolean('is_ai_answer').default(false),
+  sources: json('sources').$type<{ articleId: string; snippet: string }[]>().default([]),
+  rating: integer('rating'),
+  metadata: json('metadata').$type<{
+    confidence?: number;
+    model?: string;
+    tokens?: number;
+  }>().default({}),
+  organizationId: varchar('organization_id', { length: 255 })
+    .notNull()
+    .references(() => organizations.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  answeredAt: timestamp('answered_at'),
+});
+
+// Search History
+export const kbSearchHistory = createTable('kb_search_history', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  query: text('query').notNull(),
+  results: json('results').$type<{ articleId: string; score: number }[]>().default([]),
+  clickedResult: varchar('clicked_result', { length: 255 }),
+  userId: varchar('user_id', { length: 255 }).references(() => users.id),
+  searchType: varchar('search_type', { length: 50 }).default('text'),
+  organizationId: varchar('organization_id', { length: 255 })
+    .notNull()
+    .references(() => organizations.id),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Article Feedback
+export const kbArticleFeedback = createTable('kb_article_feedback', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  articleId: varchar('article_id', { length: 255 })
+    .notNull()
+    .references(() => kbArticles.id),
+  userId: varchar('user_id', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  helpful: boolean('helpful').notNull(),
+  comment: text('comment'),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 // Activity Logs
@@ -278,14 +361,20 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   reportedTasks: many(tasks, { relationName: 'reporter' }),
   comments: many(comments),
   workLogs: many(workLogs),
-  knowledgeBaseEntries: many(knowledgeBase),
+  kbArticles: many(kbArticles),
+  askedQuestions: many(kbQuestions, { relationName: 'askedQuestions' }),
+  answeredQuestions: many(kbQuestions, { relationName: 'answeredQuestions' }),
+  kbFeedback: many(kbArticleFeedback),
   activityLogs: many(activityLogs),
 }));
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
   users: many(users),
   projects: many(projects),
-  knowledgeBase: many(knowledgeBase),
+  kbArticles: many(kbArticles),
+  kbCategories: many(kbCategories),
+  kbQuestions: many(kbQuestions),
+  kbSearchHistory: many(kbSearchHistory),
   activityLogs: many(activityLogs),
   integrations: many(integrations),
 }));
@@ -306,7 +395,6 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   subprojects: many(projects, { relationName: 'subprojects' }),
   tasks: many(tasks),
-  knowledgeBase: many(knowledgeBase),
 }));
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
@@ -373,17 +461,65 @@ export const workLogsRelations = relations(workLogs, ({ one }) => ({
   }),
 }));
 
-export const knowledgeBaseRelations = relations(knowledgeBase, ({ one }) => ({
+export const kbArticlesRelations = relations(kbArticles, ({ one, many }) => ({
   organization: one(organizations, {
-    fields: [knowledgeBase.organizationId],
+    fields: [kbArticles.organizationId],
     references: [organizations.id],
   }),
-  project: one(projects, {
-    fields: [knowledgeBase.projectId],
-    references: [projects.id],
-  }),
   author: one(users, {
-    fields: [knowledgeBase.authorId],
+    fields: [kbArticles.authorId],
+    references: [users.id],
+  }),
+  category: one(kbCategories, {
+    fields: [kbArticles.categoryId],
+    references: [kbCategories.id],
+  }),
+  questions: many(kbQuestions),
+  feedback: many(kbArticleFeedback),
+}));
+
+export const kbCategoriesRelations = relations(kbCategories, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [kbCategories.organizationId],
+    references: [organizations.id],
+  }),
+  parent: one(kbCategories, {
+    fields: [kbCategories.parentId],
+    references: [kbCategories.id],
+    relationName: 'subcategories',
+  }),
+  subcategories: many(kbCategories, { relationName: 'subcategories' }),
+  articles: many(kbArticles),
+}));
+
+export const kbQuestionsRelations = relations(kbQuestions, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [kbQuestions.organizationId],
+    references: [organizations.id],
+  }),
+  article: one(kbArticles, {
+    fields: [kbQuestions.articleId],
+    references: [kbArticles.id],
+  }),
+  askedBy: one(users, {
+    fields: [kbQuestions.askedById],
+    references: [users.id],
+    relationName: 'askedQuestions',
+  }),
+  answeredBy: one(users, {
+    fields: [kbQuestions.answeredById],
+    references: [users.id],
+    relationName: 'answeredQuestions',
+  }),
+}));
+
+export const kbArticleFeedbackRelations = relations(kbArticleFeedback, ({ one }) => ({
+  article: one(kbArticles, {
+    fields: [kbArticleFeedback.articleId],
+    references: [kbArticles.id],
+  }),
+  user: one(users, {
+    fields: [kbArticleFeedback.userId],
     references: [users.id],
   }),
 }));
@@ -413,3 +549,15 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
+
+// Re-export knowledge schema
+export * from './schema-knowledge';
+
+// Re-export organization schema
+export * from './schema-organization';
+
+// Re-export templates schema
+export * from './schema-templates';
+
+// Re-export RBAC schema
+export * from './schema-rbac';
