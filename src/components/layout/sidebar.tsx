@@ -18,11 +18,10 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Projects', href: '/projects', icon: FolderOpen },
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
-  { name: 'Users', href: '/organization?tab=users', icon: Users },
+  { name: 'Team', href: '/users', icon: Users },
   { name: 'Templates', href: '/templates', icon: FileText },
   { name: 'Knowledge Base', href: '/knowledge', icon: BookOpen },
   { name: 'Organization', href: '/organization', icon: Building2 },
-  { name: 'Permissions', href: '/settings/permissions', icon: Shield },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
