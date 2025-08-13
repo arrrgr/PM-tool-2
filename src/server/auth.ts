@@ -32,6 +32,7 @@ const loginSchema = z.object({
 });
 
 export const config: NextAuthConfig = {
+  trustHost: true, // Trust the host header in production
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
@@ -77,22 +78,11 @@ export const config: NextAuthConfig = {
             },
           });
 
-          // Debug logging
-          console.log('Auth attempt for:', email);
-          console.log('User found:', !!user);
-          if (user) {
-            console.log('User has hashedPassword:', !!user.hashedPassword);
-            console.log('User keys:', Object.keys(user));
-          }
-
           if (!user || !user.hashedPassword) {
-            console.log('Auth failed: no user or password');
             return null;
           }
 
           const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
-          console.log('Password match:', passwordMatch);
-          
           if (!passwordMatch) {
             return null;
           }
