@@ -12,6 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/lib/seed.ts",
+    "db:seed:kb": "node scripts/seed-knowledge-base.js",
     "migrate": "node scripts/migrate.js",
     "setup:production": "node scripts/seed-production.js"
   },
