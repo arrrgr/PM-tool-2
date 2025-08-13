@@ -57,7 +57,7 @@ async function seedDemoData() {
     const antonId = nanoid();
 
     await sql`
-      INSERT INTO pmtool_user (id, email, name, hashed_password, role, organization_id)
+      INSERT INTO pmtool_user (id, email, name, password, role, organization_id)
       VALUES 
         (${adminId}, 'arthur@pmtool.demo', 'Arthur', ${hashedPassword}, 'admin', ${orgId}),
         (${vladId}, 'vlad@pmtool.demo', 'Vlad', ${hashedPassword}, 'member', ${orgId}),
