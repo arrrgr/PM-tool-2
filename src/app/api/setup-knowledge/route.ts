@@ -457,16 +457,11 @@ Read-only access for stakeholders:
       `);
     }
 
-    const articleCount = await db.execute(sql`
-      SELECT COUNT(*) as count FROM pmtool_knowledge_articles
-    `);
-
     return NextResponse.json({
       success: true,
       message: 'Knowledge base setup complete!',
       categoriesCreated: categories.length,
       articlesCreated: articles.length,
-      totalArticles: articleCount.rows[0]?.count || 0,
     });
     
   } catch (error: any) {
