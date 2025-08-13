@@ -1,24 +1,21 @@
-const { Client } = require('pg');
+const postgres = require('postgres');
 
 async function addKnowledgeBase() {
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-  });
+  const sql = postgres(process.env.DATABASE_URL);
 
   try {
-    await client.connect();
     console.log('Connected to database');
 
     // Create categories
     console.log('Creating knowledge base categories...');
-    await client.query(`
+    await sql`
       INSERT INTO pmtool_kb_category (id, name, slug, organization_id) VALUES
       ('kb-cat-doc', 'Documentation', 'documentation', 'pm-tool-org'),
       ('kb-cat-feat', 'Features', 'features', 'pm-tool-org'),
       ('kb-cat-bug', 'Bug Fixes', 'bug-fixes', 'pm-tool-org'),
       ('kb-cat-deploy', 'Deployment', 'deployment', 'pm-tool-org')
       ON CONFLICT (id) DO NOTHING
-    `);
+    `;
 
     // Add articles
     const articles = [
@@ -167,20 +164,22 @@ Comprehensive system for managing users, roles, and permissions.
 
     for (const article of articles) {
       console.log(`Adding article: ${article.title}`);
-      await client.query(`
+      await sql`
         INSERT INTO pmtool_kb_article (
           id, title, slug, content, summary, status, type,
           organization_id, author_id, category_id, tags,
           published_at, created_at, updated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, 'published', 'documentation',
-          'pm-tool-org', 'arthur-admin', $6, '["documentation"]'::json,
+          ${article.id}, ${article.title}, ${article.slug}, ${article.content}, 
+          ${article.summary}, 'published', 'documentation',
+          'pm-tool-org', 'arthur-admin', ${article.categoryId}, 
+          '["documentation"]'::json,
           NOW(), NOW(), NOW()
         )
         ON CONFLICT (id) DO UPDATE SET
           content = EXCLUDED.content,
           updated_at = NOW()
-      `, [article.id, article.title, article.slug, article.content, article.summary, article.categoryId]);
+      `;
     }
 
     console.log('✅ Knowledge base articles added successfully!');
@@ -189,7 +188,7 @@ Comprehensive system for managing users, roles, and permissions.
     console.error('Error:', error);
     throw error;
   } finally {
-    await client.end();
+    await sql.end();
   }
 }
 
