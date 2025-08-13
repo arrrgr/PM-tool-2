@@ -77,11 +77,22 @@ export const config: NextAuthConfig = {
             },
           });
 
+          // Debug logging
+          console.log('Auth attempt for:', email);
+          console.log('User found:', !!user);
+          if (user) {
+            console.log('User has hashedPassword:', !!user.hashedPassword);
+            console.log('User keys:', Object.keys(user));
+          }
+
           if (!user || !user.hashedPassword) {
+            console.log('Auth failed: no user or password');
             return null;
           }
 
           const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+          console.log('Password match:', passwordMatch);
+          
           if (!passwordMatch) {
             return null;
           }
