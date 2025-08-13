@@ -3,7 +3,7 @@ import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 import { tasks, projects, users } from '@/server/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
-import { generateId } from 'lucia';
+import { nanoid } from 'nanoid';
 
 // GET: List all epics in a project
 export async function GET(request: NextRequest) {
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     const [newEpic] = await db
       .insert(tasks)
       .values({
-        id: generateId(),
+        id: nanoid(),
         key: epicKey,
         title,
         description,

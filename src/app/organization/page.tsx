@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +11,7 @@ import { SettingsTab } from '@/components/organization/settings-tab';
 import { BillingTab } from '@/components/organization/billing-tab';
 import { Building2, Users, Settings, CreditCard, Mail } from 'lucide-react';
 
-export default function OrganizationPage() {
+function OrganizationContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab') || 'users';
 
@@ -70,5 +71,13 @@ export default function OrganizationPage() {
         </Tabs>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function OrganizationPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div>Loading...</div></DashboardLayout>}>
+      <OrganizationContent />
+    </Suspense>
   );
 }

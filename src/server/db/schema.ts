@@ -315,6 +315,23 @@ export const kbArticleFeedback = createTable('kb_article_feedback', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+// Time Entries
+export const timeEntries = createTable('time_entry', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  taskId: varchar('task_id', { length: 255 })
+    .notNull()
+    .references(() => tasks.id),
+  userId: varchar('user_id', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  startTime: timestamp('start_time').notNull(),
+  endTime: timestamp('end_time'),
+  duration: integer('duration'), // in seconds
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
 // Activity Logs
 export const activityLogs = createTable('activity_log', {
   id: serial('id').primaryKey(),
