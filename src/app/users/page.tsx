@@ -3,23 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -31,33 +16,22 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { 
-  Search, 
-  UserPlus, 
-  Mail, 
   Shield, 
-  UserCheck,
-  UserX,
   Edit,
   MoreVertical,
   Plus,
   Trash2,
-  Settings,
-  Users as UsersIcon,
-  Lock,
-  Key,
-  FileText,
   CheckSquare,
   FolderOpen,
   Clock,
   FileDown,
   BookOpen,
-  Building
+  Building,
+  Users as UsersIcon
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -212,23 +186,13 @@ const DEFAULT_ROLES: Role[] = [
   },
 ];
 
-export default function UsersPage() {
+export default function TeamPage() {
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>(DEFAULT_ROLES);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [createRoleDialogOpen, setCreateRoleDialogOpen] = useState(false);
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [activeTab, setActiveTab] = useState('users');
-  
-  // Form states for invite
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteName, setInviteName] = useState('');
-  const [inviteRole, setInviteRole] = useState('member');
   
   // Form states for role creation
   const [newRoleName, setNewRoleName] = useState('');
@@ -269,33 +233,6 @@ export default function UsersPage() {
     }
   };
 
-  const handleInviteUser = async () => {
-    try {
-      const response = await fetch('/api/users/invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: inviteEmail,
-          name: inviteName,
-          role: inviteRole,
-        }),
-      });
-
-      if (response.ok) {
-        toast.success('User invited successfully');
-        setInviteDialogOpen(false);
-        setInviteEmail('');
-        setInviteName('');
-        setInviteRole('member');
-        fetchUsers();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Failed to invite user');
-      }
-    } catch (error) {
-      toast.error('Failed to invite user');
-    }
-  };
 
   const handleCreateRole = async () => {
     try {
@@ -364,74 +301,9 @@ export default function UsersPage() {
     }
   };
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/role`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole }),
-      });
 
-      if (response.ok) {
-        toast.success('Role updated successfully');
-        setUsers(users.map(u => 
-          u.id === userId ? { ...u, role: newRole } : u
-        ));
-        setEditingUserId(null);
-      } else {
-        toast.error('Failed to update role');
-      }
-    } catch (error) {
-      toast.error('Failed to update role');
-    }
-  };
 
-  const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !isActive }),
-      });
 
-      if (response.ok) {
-        toast.success(isActive ? 'User deactivated' : 'User activated');
-        setUsers(users.map(u => 
-          u.id === userId ? { ...u, isActive: !isActive } : u
-        ));
-      } else {
-        toast.error('Failed to update user status');
-      }
-    } catch (error) {
-      toast.error('Failed to update user status');
-    }
-  };
-
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    
-    return matchesSearch && matchesRole;
-  });
-
-  const getRoleBadgeColor = (roleName: string) => {
-    switch (roleName) {
-      case 'admin': return 'bg-red-500';
-      case 'member': return 'bg-blue-500';
-      case 'viewer': return 'bg-gray-500';
-      default: return 'bg-green-500';
-    }
-  };
-
-  const getInitials = (name: string | null, email: string) => {
-    if (name) {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    }
-    return email[0].toUpperCase();
-  };
 
   const togglePermission = (permission: string) => {
     setNewRolePermissions(prev => 
@@ -446,247 +318,14 @@ export default function UsersPage() {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Team & Permissions</h1>
+          <h1 className="text-3xl font-bold">Roles & Permissions</h1>
           <p className="text-muted-foreground">
-            Manage your team members and their access permissions
+            Manage roles and their access permissions
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="users">
-              <UsersIcon className="mr-2 h-4 w-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="roles">
-              <Shield className="mr-2 h-4 w-4" />
-              Roles & Permissions
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="flex gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name or email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 w-[300px]"
-                  />
-                </div>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="All Roles" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    {roles.map(role => (
-                      <SelectItem key={role.id} value={role.id}>
-                        {role.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {canManage && (
-                <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Invite User
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Invite Team Member</DialogTitle>
-                      <DialogDescription>
-                        Send an invitation to join your organization
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={inviteEmail}
-                          onChange={(e) => setInviteEmail(e.target.value)}
-                          placeholder="colleague@company.com"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          id="name"
-                          value={inviteName}
-                          onChange={(e) => setInviteName(e.target.value)}
-                          placeholder="John Doe"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="role">Role</Label>
-                        <Select value={inviteRole} onValueChange={setInviteRole}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {roles.map(role => (
-                              <SelectItem key={role.id} value={role.id}>
-                                {role.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleInviteUser}>
-                        Send Invitation
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
-
-            {/* Users Table */}
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Active</TableHead>
-                    <TableHead>Joined</TableHead>
-                    {canManage && <TableHead className="w-[50px]"></TableHead>}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
-                        Loading...
-                      </TableCell>
-                    </TableRow>
-                  ) : filteredUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
-                        No users found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredUsers.map(user => {
-                      const userRole = roles.find(r => r.id === user.role);
-                      return (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Avatar>
-                                <AvatarImage src={user.image || undefined} />
-                                <AvatarFallback>
-                                  {getInitials(user.name, user.email)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="font-medium">{user.name || 'Unnamed'}</div>
-                                <div className="text-sm text-muted-foreground">{user.email}</div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {editingUserId === user.id && canManage ? (
-                              <Select 
-                                value={user.role} 
-                                onValueChange={(value) => handleRoleChange(user.id, value)}
-                              >
-                                <SelectTrigger className="w-[120px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {roles.map(role => (
-                                    <SelectItem key={role.id} value={role.id}>
-                                      {role.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Badge 
-                                className={`${getRoleBadgeColor(user.role)} text-white cursor-pointer`}
-                                onClick={() => canManage && setEditingUserId(user.id)}
-                              >
-                                {userRole?.name || user.role}
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={user.isActive ? 'default' : 'secondary'}>
-                              {user.isActive ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {user.lastLogin 
-                              ? new Date(user.lastLogin).toLocaleDateString()
-                              : 'Never'
-                            }
-                          </TableCell>
-                          <TableCell>
-                            {new Date(user.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          {canManage && (
-                            <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem 
-                                    onClick={() => setEditingUserId(user.id)}
-                                  >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit Role
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                                  >
-                                    {user.isActive ? (
-                                      <>
-                                        <UserX className="mr-2 h-4 w-4" />
-                                        Deactivate
-                                      </>
-                                    ) : (
-                                      <>
-                                        <UserCheck className="mr-2 h-4 w-4" />
-                                        Activate
-                                      </>
-                                    )}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
-
-          {/* Roles & Permissions Tab */}
-          <TabsContent value="roles" className="space-y-4">
+        {/* Roles & Permissions Content */}
+        <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Manage Roles</h2>
               {canManage && (
@@ -847,8 +486,7 @@ export default function UsersPage() {
                 );
               })}
             </div>
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
     </DashboardLayout>
   );

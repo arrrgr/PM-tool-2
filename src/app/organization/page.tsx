@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InvitationsTab } from '@/components/organization/invitations-tab';
-import { UsersTab } from '@/components/organization/users-tab';
+import { UsersTable } from '@/components/organization/users-table';
 import { TeamsTab } from '@/components/organization/teams-tab';
 import { SettingsTab } from '@/components/organization/settings-tab';
 import { BillingTab } from '@/components/organization/billing-tab';
@@ -50,7 +50,15 @@ function OrganizationContent() {
           </TabsList>
 
           <TabsContent value="users">
-            <UsersTab />
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">Users</h2>
+                <p className="text-muted-foreground">
+                  Manage your users and their access to projects.
+                </p>
+              </div>
+              <UsersTable />
+            </div>
           </TabsContent>
 
           <TabsContent value="invitations">
