@@ -13,6 +13,7 @@ const createTaskSchema = z.object({
   assigneeId: z.string().uuid().optional(),
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
   type: z.enum(['task', 'feature', 'bug', 'improvement', 'story']).default('task'),
+  status: z.string().optional().default('To Do'),
   storyPoints: z.number().min(1).max(100).optional(),
   dueDate: z.string().optional(),
 });
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, projectId, assigneeId, priority, type, storyPoints, dueDate } = 
+    const { title, description, projectId, assigneeId, priority, type, status, storyPoints, dueDate } = 
       createTaskSchema.parse(body);
 
     // Verify the project belongs to the user's organization
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       projectId,
       assigneeId: assigneeId || null,
       reporterId: session.user.id,
-      status: 'To Do',
+      status: status || 'To Do',
       priority,
       type,
       storyPoints: storyPoints || null,
