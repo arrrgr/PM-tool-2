@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
-import { teams, teamMembers, users } from '@/server/db/schema';
+import { users } from '@/server/db/schema';
+import { teams, teamMembers } from '@/server/db/schema-organization';
 import { eq, and, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
