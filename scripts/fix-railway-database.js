@@ -58,7 +58,44 @@ async function fixRailwayDatabase() {
       console.log('✅ epic_id column already exists');
     }
     
-    // 3. Check teams table columns
+    // 3. Check for progress column
+    const hasProgress = taskColumns.some(col => col.column_name === 'progress');
+    
+    if (!hasProgress) {
+      console.log('➕ Adding missing progress column to pmtool_task...');
+      await sql`
+        ALTER TABLE pmtool_task 
+        ADD COLUMN progress INTEGER DEFAULT 0
+      `;
+      console.log('✅ Added progress column');
+    } else {
+      console.log('✅ progress column already exists');
+    }
+    
+    // 4. Check for other potentially missing columns
+    const columnsToCheck = [
+      { name: 'original_estimate', type: 'INTEGER', default: 'NULL' },
+      { name: 'remaining_estimate', type: 'INTEGER', default: 'NULL' },
+      { name: 'time_spent', type: 'INTEGER', default: '0' },
+      { name: 'labels', type: 'JSONB', default: 'NULL' },
+      { name: 'custom_fields', type: 'JSONB', default: 'NULL' },
+      { name: 'is_archived', type: 'BOOLEAN', default: 'false' }
+    ];
+    
+    for (const column of columnsToCheck) {
+      const hasColumn = taskColumns.some(col => col.column_name === column.name);
+      if (!hasColumn) {
+        console.log(`➕ Adding missing ${column.name} column to pmtool_task...`);
+        const defaultValue = column.default === 'NULL' ? '' : ` DEFAULT ${column.default}`;
+        await sql.unsafe(`
+          ALTER TABLE pmtool_task 
+          ADD COLUMN ${column.name} ${column.type}${defaultValue}
+        `);
+        console.log(`✅ Added ${column.name} column`);
+      }
+    }
+    
+    // 5. Check teams table columns
     const teamsExists = await sql`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -87,7 +124,7 @@ async function fixRailwayDatabase() {
       console.log('✅ pmtool_team table already exists');
     }
     
-    // 4. Check team_members table
+    // 6. Check team_members table
     const teamMembersExists = await sql`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -111,7 +148,7 @@ async function fixRailwayDatabase() {
       console.log('✅ pmtool_team_member table already exists');
     }
     
-    // 5. Verify all changes
+    // 7. Verify all changes
     console.log('\n📋 Final verification...');
     
     const finalTaskColumns = await sql`
