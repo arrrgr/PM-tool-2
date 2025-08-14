@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PM Tool - Complete Test Suite</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #ddd;
+            background: #f9f9f9;
+        }
+        .success { border-left-color: #4caf50; background: #e8f5e9; }
+        .error { border-left-color: #f44336; background: #ffebee; }
+        .warning { border-left-color: #ff9800; background: #fff3e0; }
+        .pending { border-left-color: #2196f3; background: #e3f2fd; }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1976d2; }
+        .log {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .credentials {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PM Tool - Complete Test Suite</h1>
+    
+    <div class="credentials">
+        <h3>Test Credentials:</h3>
+        <p><strong>Admin:</strong> admin@test.com / admin123</p>
+        <p><strong>User:</strong> user@test.com / user123</p>
+    </div>
+
+    <div class="test-section">
+        <h2>1. Authentication Test</h2>
+        <button onclick="testAuth()">Test Login</button>
+        <button onclick="testLogout()">Test Logout</button>
+        <div id="auth-result" class="test-item pending">Click to test authentication</div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Task Creation Test</h2>
+        <button onclick="testTaskCreation()">Create Test Task</button>
+        <div id="task-result" class="test-item pending">Click to test task creation</div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Team Creation Test</h2>
+        <button onclick="testTeamCreation()">Create Test Team</button>
+        <div id="team-result" class="test-item pending">Click to test team creation</div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Drag & Drop Test</h2>
+        <button onclick="testDragDrop()">Test Drag & Drop</button>
+        <div id="drag-result" class="test-item pending">Click to test drag and drop</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000';
+        let sessionToken = null;
+        let csrfToken = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logDiv.innerHTML += `<div style="color: ${color}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateTestResult(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            element.className = 'test-item ' + status;
+            element.textContent = message;
+        }
+
+        async function testAuth() {
+            try {
+                log('Starting authentication test...');
+                updateTestResult('auth-result', 'pending', 'Testing authentication...');
+                
+                // Get CSRF token
+                const csrfResponse = await fetch(`${BASE_URL}/api/auth/csrf`);
+                const csrfData = await csrfResponse.json();
+                csrfToken = csrfData.csrfToken;
+                log(`Got CSRF token: ${csrfToken.substring(0, 20)}...`);
+                
+                // Login
+                const formData = new URLSearchParams();
+                formData.append('email', 'admin@test.com');
+                formData.append('password', 'admin123');
+                formData.append('csrfToken', csrfToken);
+                formData.append('callbackUrl', `${BASE_URL}/dashboard`);
+                formData.append('json', 'true');
+                
+                const loginResponse = await fetch(`${BASE_URL}/api/auth/callback/credentials`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                log(`Login response status: ${loginResponse.status}`);
+                
+                // Check session
+                const sessionResponse = await fetch(`${BASE_URL}/api/auth/session`, {
+                    credentials: 'include'
+                });
+                const session = await sessionResponse.json();
+                
+                if (session && session.user) {
+                    updateTestResult('auth-result', 'success', `✅ Logged in as ${session.user.email}`);
+                    log('Authentication successful!', 'success');
+                    sessionToken = true; // Mark as authenticated
+                } else {
+                    updateTestResult('auth-result', 'error', '❌ Authentication failed');
+                    log('Authentication failed', 'error');
+                }
+                
+            } catch (error) {
+                updateTestResult('auth-result', 'error', `❌ Error: ${error.message}`);
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/signout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `csrfToken=${csrfToken}`
+                });
+                
+                if (response.ok) {
+                    updateTestResult('auth-result', 'warning', '⚠️ Logged out');
+                    log('Logged out successfully');
+                    sessionToken = null;
+                }
+            } catch (error) {
+                log(`Logout error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTaskCreation() {
+            try {
+                log('Starting task creation test...');
+                updateTestResult('task-result', 'pending', 'Testing task creation...');
+                
+                if (!sessionToken) {
+                    updateTestResult('task-result', 'warning', '⚠️ Please login first');
+                    return;
+                }
+                
+                // Get projects first
+                const projectsResponse = await fetch(`${BASE_URL}/api/projects`, {
+                    credentials: 'include'
+                });
+                
+                if (!projectsResponse.ok) {
+                    throw new Error('Failed to fetch projects');
+                }
+                
+                const projects = await projectsResponse.json();
+                if (projects.length === 0) {
+                    throw new Error('No projects available');
+                }
+                
+                const projectId = projects[0].id;
+                log(`Using project: ${projects[0].name}`);
+                
+                // Create task
+                const taskData = {
+                    title: `Test Task ${Date.now()}`,
+                    description: 'Created by test suite',
+                    projectId: projectId,
+                    priority: 'high',
+                    type: 'task',
+                    status: 'To Do'
+                };
+                
+                const taskResponse = await fetch(`${BASE_URL}/api/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(taskData),
+                    credentials: 'include'
+                });
+                
+                if (taskResponse.ok) {
+                    const task = await taskResponse.json();
+                    updateTestResult('task-result', 'success', `✅ Task created: ${task.key} - ${task.title}`);
+                    log(`Task created successfully: ${task.key}`, 'success');
+                } else {
+                    const error = await taskResponse.text();
+                    updateTestResult('task-result', 'error', `❌ Failed: ${error}`);
+                    log(`Task creation failed: ${error}`, 'error');
+                }
+                
+            } catch (error) {
+                updateTestResult('task-result', 'error', `❌ Error: ${error.message}`);
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTeamCreation() {
+            try {
+                log('Starting team creation test...');
+                updateTestResult('team-result', 'pending', 'Testing team creation...');
+                
+                if (!sessionToken) {
+                    updateTestResult('team-result', 'warning', '⚠️ Please login first');
+                    return;
+                }
+                
+                const teamData = {
+                    name: `Test Team ${Date.now()}`,
+                    description: 'Created by test suite'
+                };
+                
+                const response = await fetch(`${BASE_URL}/api/organizations/teams`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(teamData),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const team = await response.json();
+                    updateTestResult('team-result', 'success', `✅ Team created: ${team.name}`);
+                    log(`Team created successfully: ${team.name}`, 'success');
+                } else {
+                    const error = await response.text();
+                    updateTestResult('team-result', 'error', `❌ Failed: ${error}`);
+                    log(`Team creation failed: ${error}`, 'error');
+                }
+                
+            } catch (error) {
+                updateTestResult('team-result', 'error', `❌ Error: ${error.message}`);
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDragDrop() {
+            try {
+                log('Starting drag & drop test...');
+                updateTestResult('drag-result', 'pending', 'Testing drag and drop...');
+                
+                if (!sessionToken) {
+                    updateTestResult('drag-result', 'warning', '⚠️ Please login first');
+                    return;
+                }
+                
+                // This would need actual tasks to exist
+                // For now, we'll just check if the endpoint is accessible
+                updateTestResult('drag-result', 'warning', '⚠️ Manual testing required in UI');
+                log('Drag & drop requires manual testing in the UI', 'warning');
+                
+            } catch (error) {
+                updateTestResult('drag-result', 'error', `❌ Error: ${error.message}`);
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run authentication on load
+        window.onload = () => {
+            log('Test suite loaded. Click buttons to run tests.');
+        };
+    </script>
+</body>
+</html>

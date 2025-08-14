@@ -1,26 +1,62 @@
 const postgres = require('postgres');
+const sql = postgres('postgresql://localhost:5432/pmtool');
 
-const DATABASE_URL = 'postgresql://postgres:HkJWsFTkIAbFvAmterwRRfhJZyhmAUwq@switchyard.proxy.rlwy.net:23135/railway';
-
-async function checkDB() {
-  const sql = postgres(DATABASE_URL);
+async function checkDatabase() {
+  console.log('🔍 Checking database structure...\n');
   
   try {
-    console.log('🔍 Checking organizations...');
-    const orgs = await sql`SELECT id, name, slug FROM pmtool_organization`;
-    console.log('Organizations:', orgs);
+    // Check columns in pmtool_user table
+    const columns = await sql`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'pmtool_user' 
+      ORDER BY ordinal_position
+    `;
     
-    console.log('\n🔍 Checking users...');
-    const users = await sql`SELECT id, email, name, organization_id, password IS NOT NULL as has_password FROM pmtool_user`;
-    console.log('Users:', users);
+    console.log('Columns in pmtool_user table:');
+    columns.forEach(col => {
+      console.log(`  - ${col.column_name} (${col.data_type})`);
+    });
+    
+    // Check for password columns
+    const passwordColumn = columns.find(col => 
+      col.column_name.includes('password') || 
+      col.column_name.includes('hashed')
+    );
+    
+    if (passwordColumn) {
+      console.log(`\n✅ Found password column: ${passwordColumn.column_name}`);
+    } else {
+      console.log('\n❌ No password column found\!');
+    }
+    
+    // Check for existing users
+    const userCount = await sql`SELECT COUNT(*) FROM pmtool_user`;
+    console.log(`\nTotal users in database: ${userCount[0].count}`);
+    
+    // Check admin user
+    const adminUser = await sql`
+      SELECT id, email, name, organization_id, role 
+      FROM pmtool_user 
+      WHERE email = 'admin@test.com'
+    `;
+    
+    if (adminUser.length > 0) {
+      console.log('\n✅ Admin user exists:');
+      console.log('  Email:', adminUser[0].email);
+      console.log('  Name:', adminUser[0].name);
+      console.log('  Role:', adminUser[0].role);
+      console.log('  Org ID:', adminUser[0].organization_id);
+    } else {
+      console.log('\n❌ Admin user not found');
+    }
     
     await sql.end();
-    process.exit(0);
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('Error:', error);
     await sql.end();
-    process.exit(1);
   }
 }
 
-checkDB();
+checkDatabase();
+EOF < /dev/null
