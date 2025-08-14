@@ -73,10 +73,131 @@ const TEMPLATES = [
   },
 ];
 
+const getTemplateTasks = (templateId: string) => {
+  const templates: Record<string, any[]> = {
+    'software-dev': [
+      { title: 'Setup development environment', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create project repository', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Define project requirements', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Design system architecture', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Setup CI/CD pipeline', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Implement core features', type: 'feature', priority: 'high', status: 'To Do' },
+      { title: 'Write unit tests', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Code review', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Deploy to staging', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'User acceptance testing', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Bug fixes', type: 'bug', priority: 'high', status: 'To Do' },
+      { title: 'Deploy to production', type: 'task', priority: 'high', status: 'To Do' },
+    ],
+    'marketing-campaign': [
+      { title: 'Define campaign objectives', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Research target audience', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create campaign strategy', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Design creative assets', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Write campaign copy', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Setup social media channels', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Launch campaign', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Monitor and analyze metrics', type: 'task', priority: 'medium', status: 'To Do' },
+    ],
+    'product-launch': [
+      { title: 'Market research', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Define product requirements', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create product roadmap', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Design prototypes', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Develop MVP', type: 'feature', priority: 'high', status: 'To Do' },
+      { title: 'User testing', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Iterate based on feedback', type: 'improvement', priority: 'medium', status: 'To Do' },
+      { title: 'Prepare marketing materials', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Set pricing strategy', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create sales collateral', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Train sales team', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Setup support channels', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Launch preparation', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Product launch', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Post-launch analysis', type: 'task', priority: 'medium', status: 'To Do' },
+    ],
+    'business-proposal': [
+      { title: 'Research client needs', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Define proposal scope', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create executive summary', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Develop solution approach', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create budget and timeline', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Review and finalize', type: 'task', priority: 'high', status: 'To Do' },
+    ],
+    'event-planning': [
+      { title: 'Define event objectives', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Set budget', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Select venue', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Create guest list', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Send invitations', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Arrange catering', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Book entertainment', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Coordinate logistics', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Setup event space', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Event execution', type: 'task', priority: 'high', status: 'To Do' },
+    ],
+    'content-calendar': [
+      { title: 'Define content strategy', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Research topics', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Create content calendar', type: 'task', priority: 'high', status: 'To Do' },
+      { title: 'Write blog posts', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Create social media content', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Review and edit content', type: 'task', priority: 'medium', status: 'To Do' },
+      { title: 'Publish and promote', type: 'task', priority: 'high', status: 'To Do' },
+    ],
+  };
+
+  return templates[templateId] || [];
+};
+
 export default function TemplatesPage() {
-  const handleUseTemplate = (templateId: string) => {
-    toast.success(`Creating project from template...`);
-    // In production, this would create a new project with the template structure
+  const handleUseTemplate = async (templateId: string) => {
+    const template = TEMPLATES.find(t => t.id === templateId);
+    if (!template) return;
+
+    try {
+      // Create project from template
+      const projectData = {
+        name: `${template.name} - ${new Date().toLocaleDateString()}`,
+        description: template.description,
+        key: templateId.toUpperCase().slice(0, 5),
+        status: 'active',
+        priority: 'medium',
+      };
+
+      const projectResponse = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(projectData),
+      });
+
+      if (!projectResponse.ok) {
+        throw new Error('Failed to create project');
+      }
+
+      const project = await projectResponse.json();
+
+      // Create template tasks
+      const templateTasks = getTemplateTasks(templateId);
+      
+      for (const task of templateTasks) {
+        await fetch('/api/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...task,
+            projectId: project.id,
+          }),
+        });
+      }
+
+      toast.success(`Project created from ${template.name} template!`);
+      // Redirect to the new project
+      window.location.href = `/projects/${project.id}`;
+    } catch (error) {
+      console.error('Error creating project from template:', error);
+      toast.error('Failed to create project from template');
+    }
   };
 
   const handleCreateTemplate = () => {
