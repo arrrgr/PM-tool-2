@@ -21,6 +21,7 @@ import {
 interface CreateTaskDialogProps {
   projectId: string;
   children: React.ReactNode;
+  initialStatus?: string;
 }
 
 interface TeamMember {
@@ -31,7 +32,7 @@ interface TeamMember {
   role: string | null;
 }
 
-export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ projectId, children, initialStatus }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -43,6 +44,7 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
     assigneeId: 'unassigned',
     storyPoints: 'none',
     dueDate: '',
+    status: initialStatus || 'To Do',
   });
 
   const { data: session } = useSession();
@@ -75,6 +77,7 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
         projectId,
         priority: formData.priority,
         type: formData.type,
+        status: formData.status,
         storyPoints: formData.storyPoints && formData.storyPoints !== 'none' ? parseInt(formData.storyPoints) : undefined,
         dueDate: formData.dueDate || undefined,
       };
@@ -102,6 +105,7 @@ export function CreateTaskDialog({ projectId, children }: CreateTaskDialogProps)
           assigneeId: 'unassigned',
           storyPoints: 'none',
           dueDate: '',
+          status: initialStatus || 'To Do',
         });
         // Force a full page reload to ensure the new task appears
         window.location.reload();

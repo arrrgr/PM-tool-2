@@ -14,8 +14,8 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { KanbanColumn } from './kanban-column';
-import { TaskCard } from './task-card';
-import { EditTaskDialog } from '@/components/tasks/edit-task-dialog';
+import { EnhancedTaskCard } from './enhanced-task-card';
+import { TaskSideSheet } from '@/components/tasks/task-side-sheet';
 
 interface Task {
   id: string;
@@ -56,12 +56,12 @@ export function KanbanBoard({ tasks, statuses, projectId, teamMembers }: KanbanB
   const [items, setItems] = useState(tasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [sideSheetOpen, setSideSheetOpen] = useState(false);
   const router = useRouter();
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
-    setEditDialogOpen(true);
+    setSideSheetOpen(true);
   };
 
   const sensors = useSensors(
@@ -162,30 +162,30 @@ export function KanbanBoard({ tasks, statuses, projectId, teamMembers }: KanbanB
         </div>
         
         <DragOverlay>
-          {activeTask ? <TaskCard task={activeTask} isDragging /> : null}
+          {activeTask ? <EnhancedTaskCard task={activeTask} isDragging teamMembers={teamMembers} /> : null}
         </DragOverlay>
       </DndContext>
       
-      {selectedTask && (
-        <EditTaskDialog
-          task={{
-            id: selectedTask.id,
-            key: selectedTask.key,
-            title: selectedTask.title,
-            description: selectedTask.description,
-            status: selectedTask.status,
-            priority: selectedTask.priority,
-            type: selectedTask.type,
-            storyPoints: selectedTask.storyPoints,
-            dueDate: selectedTask.dueDate,
-            assigneeId: selectedTask.assignee?.id || null,
-            projectId: projectId,
-          }}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          teamMembers={teamMembers}
-        />
-      )}
+      <TaskSideSheet
+        task={selectedTask ? {
+          id: selectedTask.id,
+          key: selectedTask.key,
+          title: selectedTask.title,
+          description: selectedTask.description,
+          status: selectedTask.status,
+          priority: selectedTask.priority,
+          type: selectedTask.type,
+          storyPoints: selectedTask.storyPoints,
+          dueDate: selectedTask.dueDate,
+          assigneeId: selectedTask.assignee?.id || null,
+          projectId: projectId,
+          createdAt: selectedTask.createdAt,
+          updatedAt: selectedTask.updatedAt,
+        } : null}
+        open={sideSheetOpen}
+        onOpenChange={setSideSheetOpen}
+        teamMembers={teamMembers}
+      />
     </div>
   );
 }

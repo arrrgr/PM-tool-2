@@ -2,9 +2,12 @@
 
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { TaskCard } from './task-card';
+import { EnhancedTaskCard } from './enhanced-task-card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Plus } from 'lucide-react';
+import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
+import { Button } from '@/components/ui/button';
 
 interface Task {
   id: string;
@@ -83,14 +86,34 @@ export function KanbanColumn({ status, tasks, projectId, teamMembers, onTaskClic
       >
         <div className="flex flex-col gap-3 min-h-[200px]">
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onClick={() => onTaskClick?.(task)} />
+            <EnhancedTaskCard 
+              key={task.id} 
+              task={task} 
+              onClick={() => onTaskClick?.(task)}
+              teamMembers={teamMembers}
+            />
           ))}
           
           {tasks.length === 0 && (
-            <div className="flex-1 flex items-center justify-center text-gray-400 text-sm py-8 border-2 border-dashed border-gray-200 rounded-lg">
-              Drop tasks here
-            </div>
+            <CreateTaskDialog projectId={projectId} initialStatus={status}>
+              <div className="flex-1 flex flex-col items-center justify-center text-gray-400 text-sm py-8 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
+                <Plus className="h-8 w-8 mb-2 text-gray-300" />
+                <span>Click to add task</span>
+              </div>
+            </CreateTaskDialog>
           )}
+          
+          {/* Add task button at bottom of column */}
+          <CreateTaskDialog projectId={projectId} initialStatus={status}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full mt-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add task
+            </Button>
+          </CreateTaskDialog>
         </div>
       </SortableContext>
     </div>

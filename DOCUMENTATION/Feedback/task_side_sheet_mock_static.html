@@ -1,0 +1,259 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>PM Task Side Sheet — Static Mock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Smooth fonts */
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 relative">
+  <!-- Faux board background -->
+  <div class="absolute inset-0 pointer-events-none select-none opacity-70">
+    <div class="grid grid-cols-3 gap-6 p-6 max-w-6xl mx-auto">
+      <div class="rounded-2xl border border-slate-200 bg-white h-[78vh] shadow-sm p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-600">TO DO</h2>
+          <span class="text-xs text-slate-400">0</span>
+        </div>
+        <div class="h-full bg-slate-50/80 rounded-xl border border-dashed border-slate-200"></div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white h-[78vh] shadow-sm p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-600">IN PROGRESS</h2>
+          <span class="text-xs text-slate-400">0</span>
+        </div>
+        <div class="h-full bg-slate-50/80 rounded-xl border border-dashed border-slate-200"></div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white h-[78vh] shadow-sm p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-600">DONE</h2>
+          <span class="text-xs text-slate-400">8</span>
+        </div>
+        <div class="h-full bg-slate-50/80 rounded-xl border border-dashed border-slate-200"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-slate-900/30"></div>
+
+  <!-- Side sheet -->
+  <aside class="fixed right-0 top-0 h-full w-full md:w-[980px] bg-white shadow-2xl border-l border-slate-200 flex flex-col">
+    <!-- Sticky header -->
+    <div class="sticky top-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-slate-200">
+      <div class="px-5 py-3 flex items-center gap-3">
+        <button class="p-2 rounded-xl hover:bg-slate-100" title="Back to board">
+          <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>PHASE3-2
+        </span>
+        <div class="flex-1"></div>
+        <button class="p-2 rounded-xl hover:bg-slate-100" title="More">
+          <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+        </button>
+        <button class="p-2 rounded-xl hover:bg-slate-100" title="Close">
+          <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.41 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/></svg>
+        </button>
+      </div>
+      <div class="px-5 pb-4">
+        <div class="w-full bg-transparent text-xl md:text-2xl font-semibold tracking-[-0.01em] text-slate-900 px-1 py-1">Fix Permissions Page runtime error</div>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Status: Done</span>
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Priority: High</span>
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Assignee: Vlad</span>
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">Due: —</span>
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">Labels: api, bug</span>
+          <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-50 text-violet-800 border border-violet-200">Story: 3 pts</span>
+          <div class="ml-auto flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-full border border-slate-300 text-slate-700 bg-white">▶ Start timer</span>
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-full border border-slate-300 text-slate-700 bg-white">＋ Follow</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto px-5 pb-24">
+      <div class="grid grid-cols-12 gap-5 max-w-[1200px] mx-auto">
+        <!-- Main column -->
+        <div class="col-span-12 lg:col-span-8 space-y-5">
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-700">Description</h3>
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-2.5 py-1 rounded-lg border border-slate-300">AI Assist</span>
+                <span class="text-xs px-2.5 py-1 rounded-lg border border-slate-300">Preview</span>
+              </div>
+            </div>
+            <div class="prose prose-slate max-w-none text-sm">
+              <p>Simplified queries to avoid null object conversion. Added guard util to normalize undefined/null values before mapping. Moved hydration to DialogTrigger to prevent runtime errors when permissions are fetched asynchronously.</p>
+              <ul>
+                <li>Acceptance: No runtime errors on Permissions page</li>
+                <li>Unit tests passing</li>
+                <li>QA sign-off on staging</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-700">Subtasks (2/4)</h3>
+              <div class="w-40">
+                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500" style="width: 50%"></div>
+                </div>
+              </div>
+            </div>
+            <ul class="divide-y divide-slate-200">
+              <li class="py-2 flex items-center gap-3">
+                <input type="checkbox" checked class="w-4 h-4 rounded border-slate-300"/>
+                <span class="flex-1 text-sm line-through text-slate-400">Reproduce runtime error on Permissions page</span>
+                <div class="text-xs text-slate-500">Aug 14 • Arthur</div>
+              </li>
+              <li class="py-2 flex items-center gap-3">
+                <input type="checkbox" checked class="w-4 h-4 rounded border-slate-300"/>
+                <span class="flex-1 text-sm line-through text-slate-400">Refactor queries to avoid null object conversion</span>
+                <div class="text-xs text-slate-500">Aug 14 • Vlad</div>
+              </li>
+              <li class="py-2 flex items-center gap-3">
+                <input type="checkbox" class="w-4 h-4 rounded border-slate-300"/>
+                <span class="flex-1 text-sm text-slate-700">Add unit tests for guard util</span>
+                <div class="text-xs text-slate-500">Aug 16 • Vlad</div>
+              </li>
+              <li class="py-2 flex items-center gap-3">
+                <input type="checkbox" class="w-4 h-4 rounded border-slate-300"/>
+                <span class="flex-1 text-sm text-slate-700">QA pass on staging</span>
+                <div class="text-xs text-slate-500">Aug 17 • Arthur</div>
+              </li>
+            </ul>
+            <div class="mt-3 flex items-center gap-2">
+              <span class="p-2 rounded-xl border border-slate-300">＋</span>
+              <input placeholder="Add a subtask… (Enter to add)" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none"/>
+              <select class="rounded-xl border border-slate-300 px-2 py-2 text-xs text-slate-600"><option>Assign</option><option>Arthur</option><option>Vlad</option></select>
+              <input type="text" placeholder="Due" class="w-24 rounded-xl border border-slate-300 px-2 py-2 text-xs text-slate-600"/>
+            </div>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-700">Comments & Activity</h3>
+              <span class="text-xs text-slate-500">Most recent first</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-semibold grid place-items-center">A</div>
+              <div class="flex-1">
+                <div class="rounded-2xl border border-slate-200 bg-white p-3 mb-3">
+                  <div class="w-full text-sm text-slate-400">Add a comment… (Ctrl/⌘ + Enter to send)</div>
+                  <div class="flex items-center justify-between mt-2">
+                    <div class="flex items-center gap-3">
+                      <span class="text-xs px-2.5 py-1 rounded-lg border border-slate-300 inline-flex items-center gap-2">📎 Attach</span>
+                      <span class="text-xs px-2.5 py-1 rounded-lg border border-slate-300 inline-flex items-center gap-2">AI Suggest</span>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white">Comment</span>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="flex gap-3">
+                    <div class="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-semibold grid place-items-center">A</div>
+                    <div class="flex-1">
+                      <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3">
+                        <div class="text-xs text-slate-500 mb-1">Arthur • Aug 13, 10:45 AM</div>
+                        <div class="text-sm">Completed: Simplified queries to avoid null object conversion</div>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-xs text-slate-500">Show 6 system updates</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-span-12 lg:col-span-4 space-y-5">
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-700 mb-3">Properties</h3>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <label class="flex flex-col gap-1"><span class="text-xs text-slate-500">Type</span><span class="rounded-xl border border-slate-300 px-2 py-2">Task</span></label>
+              <label class="flex flex-col gap-1"><span class="text-xs text-slate-500">Epic</span><span class="rounded-xl border border-slate-300 px-2 py-2">Phase 3</span></label>
+              <label class="flex flex-col gap-1"><span class="text-xs text-slate-500">Sprint</span><span class="rounded-xl border border-slate-300 px-2 py-2">Aug 12–18</span></label>
+              <label class="flex flex-col gap-1"><span class="text-xs text-slate-500">Estimate</span><span class="rounded-xl border border-slate-300 px-2 py-2">3 pts</span></label>
+              <label class="col-span-2 flex flex-col gap-1"><span class="text-xs text-slate-500">Labels</span><span class="rounded-xl border border-slate-300 px-2 py-2">api, bug</span></label>
+            </div>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-700">Time Tracking</h3>
+              <span class="text-xs text-slate-500">0h 00m</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl border border-slate-300 text-slate-700 bg-white">▶ Start timer</span>
+              <span class="text-xs px-2.5 py-1 rounded-lg border border-slate-300">＋ Add time</span>
+            </div>
+            <ul class="mt-3 text-xs text-slate-600 space-y-2">
+              <li>No time logged yet</li>
+            </ul>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-700">Attachments</h3>
+              <span class="text-xs text-slate-500">Max 10MB</span>
+            </div>
+            <div class="border border-dashed border-slate-300 rounded-2xl py-8 grid place-items-center text-sm text-slate-500">
+              <div class="flex items-center gap-2">📎 <span>Drop files here or click to browse</span></div>
+            </div>
+            <ul class="mt-3 text-sm text-slate-700 space-y-2">
+              <li class="flex items-center justify-between"><span class="truncate">— No attachments yet</span></li>
+            </ul>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-700 mb-3">Links</h3>
+            <ul class="text-sm text-indigo-700 space-y-2">
+              <li><a href="#" class="hover:underline">PR #182 • permissions-null-guard</a></li>
+              <li><a href="#" class="hover:underline">Spec Doc • Access Control</a></li>
+              <li><a href="#" class="hover:underline">Design • Dialog patterns</a></li>
+            </ul>
+          </section>
+
+          <section class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-700 mb-3">Followers / Notifications</h3>
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-semibold grid place-items-center">A</div>
+              <div class="w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-semibold grid place-items-center">V</div>
+              <span class="ml-auto text-xs px-2.5 py-1 rounded-lg border border-slate-300">Add follower</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky footer -->
+    <div class="sticky bottom-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-t border-slate-200">
+      <div class="px-5 py-3 flex items-center gap-3">
+        <span class="text-xs text-slate-500">Last saved just now</span>
+        <div class="ml-auto flex items-center gap-2">
+          <span class="text-xs px-3 py-1.5 rounded-lg border border-slate-300">Undo</span>
+          <span class="text-xs px-3 py-1.5 rounded-lg border border-slate-300">Redo</span>
+          <span class="text-xs px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700">Delete</span>
+          <span class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white">Archive</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Decorative top search -->
+  <div class="fixed top-6 left-6 right-[1000px] hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-white/80 backdrop-blur border border-slate-200 shadow-sm text-slate-500">
+    <svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="m15.5 14 5 5-1.5 1.5-5-5V14h-.79A6.71 6.71 0 1 1 15.5 14ZM10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/></svg>
+    <input placeholder="Search tasks…" class="flex-1 bg-transparent outline-none text-sm"/>
+  </div>
+</body>
+</html>
