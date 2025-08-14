@@ -24,7 +24,7 @@ export const users = createTable('user', {
     mode: 'date',
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar('image', { length: 255 }),
-  hashedPassword: varchar('password', { length: 255 }),
+  hashedPassword: varchar('hashed_password', { length: 255 }),
   organizationId: varchar('organization_id', { length: 255 }),
   role: varchar('role', { length: 50 }).default('member'),
   isActive: boolean('is_active').default(true),
