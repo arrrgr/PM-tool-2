@@ -15,7 +15,8 @@
     "db:seed": "tsx src/lib/seed.ts",
     "db:seed:kb": "node scripts/seed-knowledge-base.js",
     "migrate": "node scripts/migrate.js",
-    "setup:production": "node scripts/seed-production.js"
+    "setup:production": "node scripts/seed-production.js",
+    "fix:railway": "node scripts/fix-railway-database.js"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
